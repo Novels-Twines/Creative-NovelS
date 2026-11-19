@@ -34,10 +34,30 @@ function normalizeEntry(meta,kind,index){
  const episodes=(meta.episodeIds||[]).map((id,i)=>({id,order:i+1,file:(kind==="ColorNovel"?"color-novels/":"novels/")+meta.id+"/episodes/episode-"+String(i+1).padStart(3,"0")+".md"}));
  return {...meta,type:kind,genre:Array.isArray(meta.genre)?meta.genre[0]||"General":meta.genre||"General",genres:Array.isArray(meta.genre)?meta.genre:[meta.genre||"General"],episodesList:episodes,episodes:episodes.length,episodeTitles:[],glyph:["✦","◉","◇","❧","♛","✧","☼","❀"][index%8],tone:index%6+1,updated:meta.status==="published"?"Published":"Recently added"};
 }
+function parseEpisodeMarkdown(markdown,path){
+ const match=markdown.match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?([\s\S]*)$/);
+ if(!match)throw new Error("Episode file has invalid frontmatter: "+path);
+ const fields={};
+ match[1].split(/\r?\n/).forEach(line=>{const part=line.match(/^([A-Za-z][A-Za-z0-9]*):\s*(.*)$/);if(part)fields[part[1]]=part[2].replace(/^["']|["']$/g,"")});
+ return {...fields,body:match[2].trim()};
+}
+async function fetchEpisodeText(path){
+ const response=await fetch(contentUrl(path),{cache:"no-store"});
+ if(!response.ok)throw new Error("Episode could not be loaded (HTTP "+response.status+")");
+ return response.text();
+}
 async function loadGroup(entries,kind){
  const ids=(entries||[]).map(entry=>typeof entry==="string"?entry:entry&&entry.id).filter(Boolean);
  const loaded=await Promise.all(ids.map(id=>fetchJson((kind==="ColorNovel"?"color-novels/":"novels/")+id+"/novel.json")));
- return loaded.filter(meta=>meta.status==="published").map((meta,index)=>normalizeEntry(meta,kind,index));
+ return Promise.all(loaded.filter(meta=>meta.status==="published").map(async(meta,index)=>{
+  const item=normalizeEntry(meta,kind,index),visible=[];
+  for(const episodeRef of item.episodesList){
+   try{const episode=parseEpisodeMarkdown(await fetchEpisodeText(episodeRef.file),episodeRef.file);if(episode.status==="published")visible.push({...episodeRef,title:episode.title||episodeRef.id})}
+   catch(error){console.warn("Skipping unavailable episode:",episodeRef.id,error)}
+  }
+  item.episodesList=visible;item.episodes=visible.length;item.episodeTitles=visible.map(episode=>episode.title);
+  return item;
+ }));
 }
 async function loadLibrary(){
  const novelStatus=$("#novelStatus"),colorStatus=$("#colorStatus");
@@ -70,14 +90,8 @@ function getEpisodePath(story,index){return story.episodesList[index].file}
 async function getEpisode(story,index){
  const path=getEpisodePath(story,index);
  if(episodeCache.has(path))return episodeCache.get(path);
- const response=await fetch(contentUrl(path),{cache:"no-store"});
- if(!response.ok)throw new Error("Episode could not be loaded (HTTP "+response.status+")");
- const markdown=await response.text();
- const match=markdown.match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?([\s\S]*)$/);
- if(!match)throw new Error("Episode file has invalid frontmatter: "+path);
- const fields={};
- match[1].split(/\r?\n/).forEach(line=>{const part=line.match(/^([A-Za-z][A-Za-z0-9]*):\s*(.*)$/);if(part)fields[part[1]]=part[2].replace(/^["']|["']$/g,"")});
- const episode={...fields,body:match[2].trim()};
+ const episode=parseEpisodeMarkdown(await fetchEpisodeText(path),path);
+ if(episode.status!=="published")throw new Error("This episode is not published.");
  episodeCache.set(path,episode);return episode;
 }
 function renderMarkdown(source){
