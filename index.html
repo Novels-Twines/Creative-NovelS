@@ -25,11 +25,20 @@
 <footer class="footer"><a class="footer-brand" href="#" data-page="home">NOVELS<span>-</span>TWINES</a><p>Stories beyond worlds. A home for imagination.</p><div class="footer-links"><button data-page="home">Home</button><button data-page="novels">Novels</button><button data-page="color">ColorNovels</button><button data-page="studio">Creator Studio</button></div><small>© <span id="year"></span> Novels-Twines. Built for stories.</small></footer><div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 const CONTENT_BASE="https://raw.githubusercontent.com/Novels-Twines/Novels-Twines-Content/main/";
+const CONTENT_FALLBACK_BASE="https://cdn.jsdelivr.net/gh/Novels-Twines/Novels-Twines-Content@main/";
 const $=s=>document.querySelector(s);
 let stories=[],colorStories=[],currentStory=null,currentEpisode=0,episodeCache=new Map();
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-function contentUrl(path){return CONTENT_BASE+path.split("/").map(encodeURIComponent).join("/")}
-async function fetchJson(path){const response=await fetch(contentUrl(path),{cache:"no-store"});if(!response.ok)throw new Error("Could not load "+path+" (HTTP "+response.status+")");return response.json()}
+function contentPath(path){return path.split("/").map(encodeURIComponent).join("/")}
+async function fetchContent(path){
+ const encoded=contentPath(path),errors=[];
+ for(const base of [CONTENT_BASE,CONTENT_FALLBACK_BASE]){
+  try{const response=await fetch(base+encoded,{cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);return response}
+  catch(error){errors.push(new URL(base).host+": "+error.message)}
+ }
+ throw new Error("Could not retrieve "+path+". Tried primary and backup content sources ("+errors.join("; ")+").");
+}
+async function fetchJson(path){const response=await fetchContent(path);try{return await response.json()}catch(error){throw new Error("Invalid JSON in "+path+": "+error.message)}}
 function normalizeEntry(meta,kind,index){
  const episodes=(meta.episodeIds||[]).map((id,i)=>({id,order:i+1,file:(kind==="ColorNovel"?"color-novels/":"novels/")+meta.id+"/episodes/episode-"+String(i+1).padStart(3,"0")+".md"}));
  return {...meta,type:kind,genre:Array.isArray(meta.genre)?meta.genre[0]||"General":meta.genre||"General",genres:Array.isArray(meta.genre)?meta.genre:[meta.genre||"General"],episodesList:episodes,episodes:episodes.length,episodeTitles:[],glyph:["✦","◉","◇","❧","♛","✧","☼","❀"][index%8],tone:index%6+1,updated:meta.status==="published"?"Published":"Recently added"};
@@ -42,8 +51,7 @@ function parseEpisodeMarkdown(markdown,path){
  return {...fields,body:match[2].trim()};
 }
 async function fetchEpisodeText(path){
- const response=await fetch(contentUrl(path),{cache:"no-store"});
- if(!response.ok)throw new Error("Episode could not be loaded (HTTP "+response.status+")");
+ const response=await fetchContent(path);
  return response.text();
 }
 async function loadGroup(entries,kind){
@@ -70,10 +78,16 @@ async function loadLibrary(){
   colorStatus.textContent=colorStories.length?"Showing approved, published ColorNovels from the content repository.":"No published ColorNovels yet. Approved collections will appear here when they are added to the public catalogue.";
  }catch(error){
   console.error("Content library loading failed:",error);
-  novelStatus.textContent="The content library could not be loaded. Please try again later.";
+  const message=error&&error.message?error.message:"An unknown network or content error occurred.";
+  novelStatus.textContent="The library could not be loaded. "+message+" ";
   novelStatus.classList.add("error");
-  colorStatus.textContent="The ColorNovels library could not be loaded.";
+  colorStatus.textContent="ColorNovels could not be loaded because the shared content catalogue request failed. ";
   colorStatus.classList.add("error");
+  for(const status of [novelStatus,colorStatus]){
+   const retry=document.createElement("button");
+   retry.type="button";retry.className="outline-button";retry.textContent="Retry";
+   retry.addEventListener("click",loadLibrary);status.appendChild(retry);
+  }
   $("#resultCount").textContent="Library unavailable";
  }
 }
