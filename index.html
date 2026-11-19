@@ -137,7 +137,7 @@ async function openEpisode(i){
   $("#readerContent").innerHTML='<div class="chapter-kicker">'+escapeHtml(currentStory.title.toUpperCase())+'</div><h1>'+escapeHtml(ep.title||"Episode "+(currentEpisode+1))+'</h1>'+renderMarkdown(ep.body);
   $("#episodePosition").textContent='Episode '+(currentEpisode+1)+' of '+currentStory.episodesList.length;
  }catch(error){
-  console.error(error);$("#readerContent").innerHTML='<h1>Episode unavailable</h1><p>The episode could not be loaded. Please try again later.</p>';$("#episodePosition").textContent="Unavailable";
+  console.error(error);$("#readerContent").innerHTML='<h1>Episode unavailable</h1><p>The episode could not be loaded. Check your connection and try again.</p><button class="outline-button" type="button" data-episode="'+currentEpisode+'">Retry episode</button>';$("#episodePosition").textContent="Unavailable";
  }
  $("#prevEpisode").disabled=currentEpisode===0;
  $("#nextEpisode").textContent=currentEpisode===currentStory.episodesList.length-1?"Back to novel":"Next episode →";
