@@ -69,6 +69,7 @@ async function loadGroup(entries,kind){
 }
 async function loadLibrary(){
  const novelStatus=$("#novelStatus"),colorStatus=$("#colorStatus");
+ for(const status of [novelStatus,colorStatus]){status.classList.remove("error");status.textContent="Connecting to the content library…"}
  try{
   const catalog=await fetchJson("catalog/index.json");
   const [novelItems,colorItems]=await Promise.all([loadGroup(catalog.novels,"Novel"),loadGroup(catalog.colorNovels,"ColorNovel")]);
