@@ -18,9 +18,9 @@ Do not upload novel chapters into this website repository. Add stories through t
 
 - Home page with latest published stories.
 - Novel catalogue with title, author, and genre search, genre filtering, and title sorting.
-- Separate ColorNovels collection.
+- Separate ColorNovels collection with a dedicated visual-story reading mode.
 - Novel detail pages with published episode lists.
-- Reading view with previous/next episode navigation.
+- Reading view with previous/next episode navigation, adjustable text size, page width, and reading theme.
 - Responsive desktop and mobile navigation.
 - Accessible focus indicators, labelled catalogue controls, keyboard-friendly story cards, and loading/error messages.
 
@@ -75,7 +75,21 @@ For the complete GitHub upload instructions, metadata examples, episode format, 
 
 Never mark an unfinished placeholder chapter as published just to make a novel appear complete. A published novel can appear in the catalogue with zero readable episodes while its episodes are still drafts.
 
-## 6. Run the website locally
+## 6. Reader and ColorNovel content format
+
+The reader interface is maintained separately in `assets/js/reader.js`. Readers can adjust text size, switch between narrow and wide reading widths, and choose a night reading background. Their preferences are saved in the browser on that device.
+
+For ColorNovels, the reader supports image-only Markdown blocks in published episode files. Store artwork in the **Content repository**, then reference it from the episode Markdown using a path relative to the Content repository root:
+
+```markdown
+![A description of the illustrated page](assets/artwork/example-page-001.jpg)
+```
+
+Put a blank line before and after each image block. The reader displays each image as a full-width visual page with the supplied alt text. Keep images and story text out of the website repository. Only ColorNovels and episodes marked `published` in the public catalogue are displayed; draft ColorNovel episodes remain hidden.
+
+See [reader and ColorNovel content guidance](docs/reader-and-color-content.md) for the authoring checklist.
+
+## 7. Run the website locally
 
 From this repository, start Python's built-in static server:
 
@@ -85,7 +99,7 @@ python -m http.server 8000
 
 Then open http://localhost:8000.
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 - **Novel does not appear:** confirm its ID is in the correct array in the Content repository's `catalog/index.json`, and confirm its `novel.json` has `"status": "published"`.
 - **Novel appears but has no episodes:** check that the episode files exist at the expected paths and that each episode's frontmatter contains `status: published`. Draft episodes are intentionally hidden.
@@ -93,14 +107,14 @@ Then open http://localhost:8000.
 - **Website code change is missing:** check the GitHub Actions deployment workflow and confirm the latest Pages deployment succeeded. Refresh the browser after deployment.
 - **Content-only change is missing:** the website does not need a rebuild for content updates; allow the raw content source/CDN to update and refresh the page.
 
-## 8. Current integration boundaries
+## 9. Current integration boundaries
 
 - Sign-in is a frontend placeholder until Supabase authentication and the backend are configured and connected.
 - Creator Studio is a preview; creator applications, admin review, and publishing are not yet available as a complete end-to-end website workflow.
 - ColorNovels has a separate catalogue and landing section; a complete visual-page artwork reader still needs to be implemented.
 - The public website displays only catalogue-listed novels with published metadata and only episodes individually marked published.
 
-## 9. Security and publishing responsibility
+## 10. Security and publishing responsibility
 
 - Never put service-role keys, database passwords, access tokens, or other secrets in this repository.
 - Keep website code here; keep novel text and artwork in the Content repository; keep server-side implementation in the Backend repository.
