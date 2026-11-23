@@ -115,3 +115,51 @@
  .latest-episodes-grid{grid-template-columns:1fr}
  .latest-episode-card{padding:14px}
 }
+
+/* Stage 5: approved character profiles and upcoming-story announcements */
+.main-nav{gap:clamp(12px,2vw,30px)}
+.character-grid{max-width:1130px;margin:0 auto;padding:0 25px 85px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.character-card{padding:0;text-align:left;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--panel);color:var(--text);transition:transform .2s,border-color .2s}
+.character-card:hover{transform:translateY(-4px);border-color:#8f3947}
+.character-card-art{display:block;position:relative;aspect-ratio:4/5;overflow:hidden;background:linear-gradient(145deg,#6b2934,#1c1216);display:grid;place-items:center}
+.character-card-art img{width:100%;height:100%;object-fit:cover}
+.character-avatar-mark{font:700 72px var(--font-display);color:#e8c5a4}
+.character-card-copy{display:grid;gap:7px;padding:16px}
+.character-card-copy small,.character-related small{font-size:8px;letter-spacing:1.8px;color:var(--gold)}
+.character-card-copy strong{font:700 20px var(--font-display)}
+.character-card-copy>span{font-size:10px;color:var(--muted)}
+.character-teaser-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.character-teaser-grid .character-card{display:grid;grid-template-columns:92px 1fr;align-items:center}
+.character-teaser-grid .character-card-art{aspect-ratio:1;width:92px}
+.character-teaser-grid .character-card-copy{padding:12px}
+.character-teaser-grid .character-card-copy strong{font-size:16px}
+.character-profile{max-width:1050px;margin:10px auto 100px;padding:0 25px;display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:55px;align-items:center}
+.character-profile-art{aspect-ratio:3/4;max-height:540px;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-md);background:linear-gradient(145deg,#6b2934,#1c1216);display:grid;place-items:center}
+.character-profile-art img{width:100%;height:100%;object-fit:cover}
+.character-profile-placeholder{font:800 100px var(--font-display);color:#e8c5a4}
+.character-profile-copy h1{font:700 clamp(38px,5vw,58px) var(--font-display);margin:12px 0}
+.character-role{color:var(--gold);font-size:12px;letter-spacing:1px}
+.character-profile-copy>p{font-size:14px;line-height:1.9;color:var(--muted);max-width:600px}
+.character-related{display:grid;justify-items:start;gap:12px;margin-top:35px;padding-top:22px;border-top:1px solid var(--line)}
+.character-related strong{font:700 20px var(--font-display)}
+.upcoming-grid{max-width:1130px;margin:0 auto;padding:0 25px 85px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.upcoming-card{overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--panel)}
+.upcoming-card-art{aspect-ratio:4/3;position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 40%,#783542,#24151a 70%)}
+.upcoming-card-art img{width:100%;height:100%;object-fit:cover}
+.upcoming-art-mark{font:700 55px var(--font-display);letter-spacing:5px;color:#e8c5a4}
+.coming-soon-label{position:absolute;left:14px;bottom:14px;padding:7px 10px;background:rgba(16,11,13,.84);color:#f4d7ba;font-size:8px;letter-spacing:1.7px}
+.upcoming-card-copy{padding:20px}
+.upcoming-card-copy>small{font-size:8px;letter-spacing:1.8px;color:var(--gold)}
+.upcoming-card-copy h2{font:700 23px var(--font-display);margin:9px 0}
+.upcoming-card-copy p{font-size:11px;line-height:1.7;color:var(--muted);min-height:38px}
+.upcoming-date{font-size:9px;color:var(--gold)}
+.upcoming-teaser-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.upcoming-teaser-grid .upcoming-card{display:grid;grid-template-columns:110px 1fr}
+.upcoming-teaser-grid .upcoming-card-art{aspect-ratio:1}
+.upcoming-teaser-grid .upcoming-card-copy{padding:13px}
+.upcoming-teaser-grid .upcoming-card-copy h2{font-size:17px}
+.upcoming-teaser-grid .upcoming-card-copy p{min-height:0}
+:root[data-theme="light"] .character-card,:root[data-theme="light"] .upcoming-card{background:var(--panel)}
+:root[data-theme="light"] .coming-soon-label{background:rgba(36,25,27,.82);color:#fff}
+@media(max-width:800px){.main-nav{gap:18px;flex-wrap:wrap}.character-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.upcoming-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.character-profile{grid-template-columns:minmax(180px,260px) 1fr;gap:28px}.character-teaser-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.main-nav{align-items:flex-start}.character-grid,.upcoming-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-inline:15px}.character-card-copy{padding:11px}.character-card-copy strong{font-size:16px}.character-profile{grid-template-columns:1fr;gap:24px}.character-profile-art{max-width:300px;width:100%;margin:auto}.character-profile-copy h1{font-size:38px}.character-teaser-grid,.upcoming-teaser-grid{grid-template-columns:1fr}.home-characters-teaser,.home-upcoming-teaser{padding-bottom:55px}.upcoming-teaser-grid .upcoming-card{grid-template-columns:95px 1fr}}
