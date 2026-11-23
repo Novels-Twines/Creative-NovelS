@@ -29,8 +29,7 @@ function applyTheme(theme, button) {
 export function initTheme() {
   const button = document.querySelector("#themeToggle");
   const saved = readSavedTheme();
-  const preferred = window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  applyTheme(saved || preferred, button);
+  applyTheme(saved || "dark", button);
   button?.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     applyTheme(next, button);
