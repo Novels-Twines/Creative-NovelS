@@ -1,4 +1,4 @@
-const CONTENT_BASE="https://raw.githubusercontent.com/Novels-Twines/Novels-Twines-Content/main/";
+import { initTheme } from "./theme.js";\n\nconst CONTENT_BASE="https://raw.githubusercontent.com/Novels-Twines/Novels-Twines-Content/main/";
 const CONTENT_FALLBACK_BASE="https://cdn.jsdelivr.net/gh/Novels-Twines/Novels-Twines-Content@main/";
 const $=s=>document.querySelector(s);
 let stories=[],colorStories=[],currentStory=null,currentEpisode=0,episodeCache=new Map();
@@ -134,6 +134,6 @@ $("#loginButton").addEventListener("click",()=>toast("Sign-in will be connected 
 $("#readerBack").addEventListener("click",()=>go("detail"));
 $("#prevEpisode").addEventListener("click",()=>openEpisode(currentEpisode-1));
 $("#nextEpisode").addEventListener("click",()=>currentEpisode===currentStory.episodesList.length-1?go("detail"):openEpisode(currentEpisode+1));
-$("#year").textContent=new Date().getFullYear();
+$("#year").textContent=new Date().getFullYear();\ninitTheme();
 document.querySelectorAll(".page").forEach(x=>x.setAttribute("aria-hidden",String(!x.classList.contains("active"))));
 render();loadLibrary();
