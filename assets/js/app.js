@@ -73,9 +73,26 @@ function card(s){const index=(s.type==="ColorNovel"?colorStories:stories).indexO
 function filtered(){const q=$("#novelSearch").value.toLowerCase(),g=$("#genreFilter").value;return stories.filter(s=>(g==="all"||s.genres.includes(g))&&[s.title,s.author,...s.genres].join(" ").toLowerCase().includes(q)).sort((a,b)=>$("#sortFilter").value==="az"?a.title.localeCompare(b.title):0)}
 function render(){
  const matches=filtered();
- $("#latestGrid").innerHTML=stories.slice(0,4).map(card).join("")||'<div class="empty-state"><strong>Stories are being prepared</strong>New novels will appear here after their chapters are reviewed and approved.</div>';
+ const latest=stories.slice(0,4);
+ $("#latestGrid").innerHTML=latest.map(card).join("")||'<div class="empty-state"><strong>Stories are being prepared</strong>New novels will appear here after their chapters are reviewed and approved.</div>';
  $("#novelGrid").innerHTML=matches.map(card).join("")||'<div class="empty-state"><strong>No matching novels</strong>Try another title, author, or genre. Published stories will appear here when they are ready.</div>';
  $("#colorGrid").innerHTML=colorStories.map(card).join("")||'<div class="empty-state"><strong>ColorNovels are in preparation</strong>Visual stories will appear here after their artwork and chapters are ready.</div>';
+ const featured=stories[0];
+ const featuredHost=$("#featuredStory");
+ if(featured){
+  featuredHost.innerHTML='<button class="featured-story-button" type="button" data-story="'+escapeHtml(featured.id)+'"><span class="featured-art tone-'+featured.tone+'">'+(featured.cover?'<img src="'+escapeHtml(CONTENT_BASE+contentPath(featured.cover))+'" alt="" loading="lazy">':'<span class="featured-art-glyph">'+escapeHtml(featured.glyph)+'</span>')+'<span class="featured-art-stamp">NOVELS-TWINES ORIGINAL</span></span><span class="featured-copy"><span class="eyebrow">START YOUR NEXT JOURNEY</span><strong>'+escapeHtml(featured.title)+'</strong><span class="featured-author">By '+escapeHtml(featured.author)+' · '+escapeHtml(featured.genres.join(", "))+'</span><span class="featured-description">'+escapeHtml(featured.description||"Open this story and explore its published episodes.")+'</span><span class="featured-cta">Explore this novel <span aria-hidden="true">↗</span></span></span></button>';
+  const heroCover=$("#heroFeatureCover");
+  heroCover.innerHTML=featured.cover?'<img src="'+escapeHtml(CONTENT_BASE+contentPath(featured.cover))+'" alt="Cover of '+escapeHtml(featured.title)+'" loading="lazy"><span class="hero-cover-caption">'+escapeHtml(featured.title)+'</span>':'<div class="feature-cover-placeholder"><span>NT</span><strong>'+escapeHtml(featured.title)+'</strong><small>FEATURED STORY</small></div>';
+  heroCover.dataset.story=featured.id;heroCover.setAttribute("role","button");heroCover.setAttribute("tabindex","0");heroCover.setAttribute("aria-label","Open featured novel "+featured.title);
+ }else{
+  featuredHost.innerHTML='<div class="featured-placeholder"><span>FEATURED</span><strong>Stories are on their way</strong><p>Published novels will appear here when available.</p></div>';
+  $("#heroFeatureCover").innerHTML='<div class="feature-cover-placeholder"><span>NT</span><strong>THE NEXT<br>GREAT STORY</strong><small>DISCOVER BELOW</small></div>';
+  $("#heroFeatureCover").removeAttribute("data-story");$("#heroFeatureCover").removeAttribute("role");$("#heroFeatureCover").removeAttribute("tabindex");
+ }
+ const genreNames=[...new Set(stories.flatMap(story=>story.genres))].slice(0,8);
+ $("#homeGenreChips").innerHTML=genreNames.length?genreNames.map(genre=>'<button type="button" data-genre="'+escapeHtml(genre)+'">'+escapeHtml(genre)+'</button>').join(""):'<span class="genre-empty">Genres will appear as published stories are added.</span>';
+ const recentEpisodes=stories.flatMap(story=>story.episodesList.map((episode,index)=>({story,episode,index}))).slice(0,4);
+ $("#latestEpisodesGrid").innerHTML=recentEpisodes.length?recentEpisodes.map(item=>'<button class="latest-episode-card" type="button" data-story="'+escapeHtml(item.story.id)+'" data-open-episode="'+item.index+'"><span class="episode-card-mark">'+escapeHtml(item.story.glyph)+'</span><span class="episode-card-copy"><small>'+escapeHtml(item.story.title)+'</small><strong>'+escapeHtml(item.episode.title||("Episode "+(item.index+1)))+'</strong><span>Read episode <span aria-hidden="true">→</span></span></span></button>').join(""):'<div class="empty-state"><strong>New chapters will appear here</strong>Published episodes from the library will be featured in this section.</div>';
  $("#resultCount").textContent=matches.length+" stories";
 }
 function go(p){const target=$("#page-"+p);if(!target)return;document.querySelectorAll(".page").forEach(x=>{x.classList.remove("active");x.setAttribute("aria-hidden","true")});target.classList.add("active");target.setAttribute("aria-hidden","false");document.querySelectorAll(".nav-link").forEach(x=>{const active=x.dataset.page===p;x.classList.toggle("active",active);if(active)x.setAttribute("aria-current","page");else x.removeAttribute("aria-current")});$("#mainNav").classList.remove("open");$("#mobileMenu").setAttribute("aria-expanded","false");window.scrollTo({top:0,behavior:"smooth"})}
@@ -125,8 +142,8 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");se
 document.addEventListener("click",e=>{
  const p=e.target.closest("[data-page]");if(p){e.preventDefault();go(p.dataset.page);return}
  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
- const c=e.target.closest("[data-story]");if(c){openStory(c.dataset.story);return}
- const ep=e.target.closest("[data-episode]");if(ep)openEpisode(Number(ep.dataset.episode));
+ const c=e.target.closest("[data-story]");if(c){if(c.dataset.openEpisode!==undefined){openStory(c.dataset.story).then(()=>openEpisode(Number(c.dataset.openEpisode)));return}openStory(c.dataset.story);return}
+ const genre=e.target.closest("[data-genre]");if(genre){$("#genreFilter").value=genre.dataset.genre;render();go("novels");return}\n const ep=e.target.closest("[data-episode]");if(ep)openEpisode(Number(ep.dataset.episode));
 });
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-story]")){e.preventDefault();e.target.click()}});
 $("#novelSearch").addEventListener("input",render);$("#genreFilter").addEventListener("change",render);$("#sortFilter").addEventListener("change",render);
