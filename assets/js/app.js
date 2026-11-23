@@ -153,6 +153,7 @@ $("#loginButton").addEventListener("click",()=>toast("Sign-in will be connected 
 $("#readerBack").addEventListener("click",()=>go("detail"));
 $("#prevEpisode").addEventListener("click",()=>openEpisode(currentEpisode-1));
 $("#nextEpisode").addEventListener("click",()=>currentEpisode===currentStory.episodesList.length-1?go("detail"):openEpisode(currentEpisode+1));
-$("#year").textContent=new Date().getFullYear();\ninitTheme();
+$("#year").textContent=new Date().getFullYear();
+initTheme();
 document.querySelectorAll(".page").forEach(x=>x.setAttribute("aria-hidden",String(!x.classList.contains("active"))));
 render();loadLibrary();
