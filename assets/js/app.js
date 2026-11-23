@@ -188,7 +188,8 @@ document.addEventListener("click",e=>{
  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
  const character=e.target.closest("[data-character]");if(character){openCharacter(character.dataset.character);return}
  const c=e.target.closest("[data-story]");if(c){if(c.dataset.openEpisode!==undefined){openStory(c.dataset.story).then(()=>openEpisode(Number(c.dataset.openEpisode)));return}openStory(c.dataset.story);return}
- const genre=e.target.closest("[data-genre]");if(genre){$("#genreFilter").value=genre.dataset.genre;render();go("novels");return}\n const ep=e.target.closest("[data-episode]");if(ep)openEpisode(Number(ep.dataset.episode));
+ const genre=e.target.closest("[data-genre]");if(genre){$("#genreFilter").value=genre.dataset.genre;render();go("novels");return}
+ const ep=e.target.closest("[data-episode]");if(ep)openEpisode(Number(ep.dataset.episode));
 });
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-story]")){e.preventDefault();e.target.click()}});
 $("#novelSearch").addEventListener("input",render);$("#genreFilter").addEventListener("change",render);$("#sortFilter").addEventListener("change",render);
