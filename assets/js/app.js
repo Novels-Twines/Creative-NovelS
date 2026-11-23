@@ -1,9 +1,11 @@
 import { initTheme } from "./theme.js";
+import { loadCharacters } from "./characters.js";
+import { loadUpcoming } from "./upcoming.js";
 
 const CONTENT_BASE="https://raw.githubusercontent.com/Novels-Twines/Novels-Twines-Content/main/";
 const CONTENT_FALLBACK_BASE="https://cdn.jsdelivr.net/gh/Novels-Twines/Novels-Twines-Content@main/";
 const $=s=>document.querySelector(s);
-let stories=[],colorStories=[],currentStory=null,currentEpisode=0,episodeCache=new Map();
+let stories=[],colorStories=[],characters=[],upcomingStories=[],currentStory=null,currentEpisode=0,episodeCache=new Map();
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 function contentPath(path){return path.split("/").map(encodeURIComponent).join("/")}
 async function fetchContent(path){
@@ -100,6 +102,43 @@ function render(){
  $("#latestEpisodesGrid").innerHTML=recentEpisodes.length?recentEpisodes.map(item=>'<button class="latest-episode-card" type="button" data-story="'+escapeHtml(item.story.id)+'" data-open-episode="'+item.index+'"><span class="episode-card-mark">'+escapeHtml(item.story.glyph)+'</span><span class="episode-card-copy"><small>'+escapeHtml(item.story.title)+'</small><strong>'+escapeHtml(item.episode.title||("Episode "+(item.index+1)))+'</strong><span>Read episode <span aria-hidden="true">→</span></span></span></button>').join(""):'<div class="empty-state"><strong>New chapters will appear here</strong>Published episodes from the library will be featured in this section.</div>';
  $("#resultCount").textContent=matches.length+" stories";
 }
+function renderCharacterCard(character){
+ const image=character.image?'<img src="'+escapeHtml(CONTENT_BASE+contentPath(character.image))+'" alt="" loading="lazy">':'<span class="character-avatar-mark">'+escapeHtml((character.name||"?").slice(0,1).toUpperCase())+'</span>';
+ const novel=stories.find(story=>story.id===character.novelId);
+ return '<button class="character-card" type="button" data-character="'+escapeHtml(character.id)+'"><span class="character-card-art">'+image+'</span><span class="character-card-copy"><small>'+escapeHtml(character.role||"STORY CHARACTER")+'</small><strong>'+escapeHtml(character.name)+'</strong><span>'+escapeHtml(novel?novel.title:"Published story")+'</span></span></button>';
+}
+function renderUpcomingCard(item){
+ const image=item.cover?'<img src="'+escapeHtml(CONTENT_BASE+contentPath(item.cover))+'" alt="" loading="lazy">':'<span class="upcoming-art-mark">NT</span>';
+ const date=item.dateConfirmed===true&&item.expectedDate?'<span class="upcoming-date">Expected '+escapeHtml(item.expectedDate)+'</span>':'<span class="upcoming-date">Release date to be announced</span>';
+ return '<article class="upcoming-card"><div class="upcoming-card-art">'+image+'<span class="coming-soon-label">COMING SOON</span></div><div class="upcoming-card-copy"><small>'+escapeHtml(item.genre||"UPCOMING STORY")+'</small><h2>'+escapeHtml(item.title)+'</h2><p>'+escapeHtml(item.teaser||"A new story is on its way.")+'</p>'+date+'</div></article>';
+}
+function renderPublicExtras(){
+ const characterCards=characters.map(renderCharacterCard);
+ $("#charactersGrid").innerHTML=characterCards.join("")||'<div class="empty-state"><strong>No public character profiles yet</strong>Character profiles will appear after they are approved and published.</div>';
+ $("#homeCharactersGrid").innerHTML=characterCards.slice(0,3).join("")||'<div class="empty-state"><strong>Characters are coming</strong>Approved public profiles will be featured here.</div>';
+ const upcomingCards=upcomingStories.map(renderUpcomingCard);
+ $("#upcomingGrid").innerHTML=upcomingCards.join("")||'<div class="empty-state"><strong>No upcoming announcements yet</strong>Approved announcements will appear here when they are ready.</div>';
+ $("#homeUpcomingGrid").innerHTML=upcomingCards.slice(0,2).join("")||'<div class="empty-state"><strong>More stories are on the horizon</strong>Approved announcements will appear here.</div>';
+}
+async function loadPublicExtras(){
+ const characterStatus=$("#charactersStatus"),upcomingStatus=$("#upcomingStatus");
+ try{
+  characters=await loadCharacters(fetchJson,stories);
+  characterStatus.textContent=characters.length?"Showing approved and published public character profiles.":"No approved public character profiles are available yet.";
+ }catch(error){characters=[];characterStatus.textContent="Character profiles are not available yet.";console.info("Optional character catalogue unavailable:",error)}
+ try{
+  upcomingStories=await loadUpcoming(fetchJson);
+  upcomingStatus.textContent=upcomingStories.length?"Showing approved and published upcoming-story announcements.":"No approved upcoming-story announcements are available yet.";
+ }catch(error){upcomingStories=[];upcomingStatus.textContent="Upcoming announcements are not available yet.";console.info("Optional upcoming catalogue unavailable:",error)}
+ renderPublicExtras();
+}
+function openCharacter(id){
+ const character=characters.find(item=>item.id===id);if(!character)return;
+ const novel=stories.find(story=>story.id===character.novelId);
+ const image=character.image?'<img src="'+escapeHtml(CONTENT_BASE+contentPath(character.image))+'" alt="'+escapeHtml(character.name)+'">':'<div class="character-profile-placeholder">'+escapeHtml((character.name||"?").slice(0,1).toUpperCase())+'</div>';
+ $("#characterProfile").innerHTML='<div class="character-profile-art">'+image+'</div><div class="character-profile-copy"><div class="eyebrow">CHARACTER PROFILE</div><h1>'+escapeHtml(character.name)+'</h1><div class="character-role">'+escapeHtml(character.role||"Story character")+'</div><p>'+escapeHtml(character.introduction||"A character in the Novels-Twines story collection.")+'</p><div class="character-related"><small>FEATURED IN</small><strong>'+escapeHtml(novel?novel.title:"A published Novels-Twines story")+'</strong>'+(novel?'<button class="primary-button" type="button" data-story="'+escapeHtml(novel.id)+'">Explore this novel →</button>':'')+'</div></div>';
+ go("character-detail");
+}
 function go(p){const target=$("#page-"+p);if(!target)return;document.querySelectorAll(".page").forEach(x=>{x.classList.remove("active");x.setAttribute("aria-hidden","true")});target.classList.add("active");target.setAttribute("aria-hidden","false");document.querySelectorAll(".nav-link").forEach(x=>{const active=x.dataset.page===p;x.classList.toggle("active",active);if(active)x.setAttribute("aria-current","page");else x.removeAttribute("aria-current")});$("#mainNav").classList.remove("open");$("#mobileMenu").setAttribute("aria-expanded","false");window.scrollTo({top:0,behavior:"smooth"})}
 function getEpisodePath(story,index){return story.episodesList[index].file}
 async function getEpisode(story,index){
@@ -147,6 +186,7 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");se
 document.addEventListener("click",e=>{
  const p=e.target.closest("[data-page]");if(p){e.preventDefault();go(p.dataset.page);return}
  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
+ const character=e.target.closest("[data-character]");if(character){openCharacter(character.dataset.character);return}
  const c=e.target.closest("[data-story]");if(c){if(c.dataset.openEpisode!==undefined){openStory(c.dataset.story).then(()=>openEpisode(Number(c.dataset.openEpisode)));return}openStory(c.dataset.story);return}
  const genre=e.target.closest("[data-genre]");if(genre){$("#genreFilter").value=genre.dataset.genre;render();go("novels");return}\n const ep=e.target.closest("[data-episode]");if(ep)openEpisode(Number(ep.dataset.episode));
 });
@@ -156,9 +196,10 @@ $("#mobileMenu").addEventListener("click",()=>{const open=$("#mainNav").classLis
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#mainNav").classList.contains("open")){$("#mainNav").classList.remove("open");$("#mobileMenu").setAttribute("aria-expanded","false");$("#mobileMenu").focus()}});
 $("#loginButton").addEventListener("click",()=>toast("Sign-in will be connected when the backend is ready."));
 $("#readerBack").addEventListener("click",()=>go("detail"));
+$("#characterBack").addEventListener("click",()=>go("characters"));
 $("#prevEpisode").addEventListener("click",()=>openEpisode(currentEpisode-1));
 $("#nextEpisode").addEventListener("click",()=>currentEpisode===currentStory.episodesList.length-1?go("detail"):openEpisode(currentEpisode+1));
 $("#year").textContent=new Date().getFullYear();
 initTheme();
 document.querySelectorAll(".page").forEach(x=>x.setAttribute("aria-hidden",String(!x.classList.contains("active"))));
-render();loadLibrary();
+render();loadLibrary().then(loadPublicExtras);
