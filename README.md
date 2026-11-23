@@ -111,7 +111,7 @@ Then open http://localhost:8000.
 
 - Sign-in is a frontend placeholder until Supabase authentication and the backend are configured and connected.
 - Creator Studio is a preview; creator applications, admin review, and publishing are not yet available as a complete end-to-end website workflow.
-- ColorNovels has a separate catalogue and landing section; a complete visual-page artwork reader still needs to be implemented.
+- ColorNovels has a separate catalogue and landing section. The reader supports published image-only Markdown blocks as illustrated pages; a richer page-by-page visual reading experience may be developed later.
 - The public website displays only catalogue-listed novels with published metadata and only episodes individually marked published.
 
 ## 10. Security and publishing responsibility
