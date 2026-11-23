@@ -163,3 +163,139 @@
 :root[data-theme="light"] .coming-soon-label{background:rgba(36,25,27,.82);color:#fff}
 @media(max-width:800px){.main-nav{gap:18px;flex-wrap:wrap}.character-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.upcoming-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.character-profile{grid-template-columns:minmax(180px,260px) 1fr;gap:28px}.character-teaser-grid{grid-template-columns:1fr}}
 @media(max-width:480px){.main-nav{align-items:flex-start}.character-grid,.upcoming-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-inline:15px}.character-card-copy{padding:11px}.character-card-copy strong{font-size:16px}.character-profile{grid-template-columns:1fr;gap:24px}.character-profile-art{max-width:300px;width:100%;margin:auto}.character-profile-copy h1{font-size:38px}.character-teaser-grid,.upcoming-teaser-grid{grid-template-columns:1fr}.home-characters-teaser,.home-upcoming-teaser{padding-bottom:55px}.upcoming-teaser-grid .upcoming-card{grid-template-columns:95px 1fr}}
+
+/* Stage 6: responsive layout refinements */
+img{max-width:100%}
+button,select,input{max-width:100%}
+.topbar{gap:clamp(10px,2vw,28px)}
+.brand{flex-shrink:0}
+.top-actions{align-items:center;flex-shrink:0}
+.main-nav{min-width:0}
+.hero-copy,.hero-art,.detail-copy,.character-profile-copy{min-width:0}
+.novel-card,.character-card,.upcoming-card{min-width:0}
+.card-meta span,.card-bottom span{overflow-wrap:anywhere}
+.featured-story-button{width:100%;min-width:0}
+.featured-copy{min-width:0}
+.featured-copy strong,.upcoming-card-copy h2,.character-card-copy strong{overflow-wrap:anywhere}
+.latest-episodes-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.latest-episode-card{min-width:0}
+@media(max-width:1100px){
+ .topbar{padding-inline:24px}
+ .main-nav{gap:clamp(8px,1.2vw,16px)}
+ .nav-link{font-size:12px}
+ .brand{gap:8px}
+ .brand-name{letter-spacing:1.5px}
+ .hero{padding-inline:28px;gap:24px}
+ .content-section{padding-inline:28px}
+ .novel-grid{gap:14px}
+ .detail-layout{gap:32px}
+}
+@media(max-width:800px){
+ .topbar{padding-inline:20px}
+ .top-actions{margin-left:auto}
+ .main-nav{z-index:30;box-shadow:0 18px 30px rgba(0,0,0,.28)}
+ .main-nav .nav-link{padding:7px 0;font-size:14px}
+ .hero-cinematic{grid-template-columns:minmax(0,1fr);text-align:left}
+ .hero-cinematic .hero-art{width:100%;max-width:520px;margin:0 auto}
+ .hero-cinematic:after{background:linear-gradient(180deg,var(--bg) 0%,transparent 45%,var(--bg) 100%)}
+ .stats-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));text-align:center}
+ .stats-strip div{justify-items:center}
+ .novel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .latest-episodes-grid{grid-template-columns:1fr}
+ .section-heading{gap:15px;align-items:center}
+ .section-heading h2{font-size:27px}
+ .detail-layout{grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:25px}
+ .detail-cover{height:auto;aspect-ratio:2/3}
+ .character-profile{grid-template-columns:minmax(180px,260px) minmax(0,1fr)}
+ .reader-top,.reader-controls{margin-inline:18px}
+ .footer-links{flex-wrap:wrap;row-gap:12px}
+}
+@media(max-width:600px){
+ .topbar{height:66px;padding-inline:14px;gap:8px}
+ .brand-mark{font-size:21px;padding:4px 7px}
+ .brand-name{font-size:8px;letter-spacing:1px}
+ .top-actions{gap:6px}
+ .theme-toggle{padding:8px;font-size:10px}
+ .login-button{padding:8px 9px;font-size:10px}
+ .hero-cinematic{padding:42px 20px 62px}
+ .hero-cinematic h1{font-size:clamp(39px,10vw,48px)}
+ .hero-cinematic .hero-copy>p{font-size:13px}
+ .hero-cinematic .hero-actions{align-items:flex-start;flex-wrap:wrap;gap:14px}
+ .hero-cinematic .hero-art{height:285px}
+ .hero-feature-cover{max-width:205px}
+ .stats-strip{margin-inline:14px;padding:17px 5px;gap:8px}
+ .stats-strip span{line-height:1.4}
+ .content-section{padding-inline:16px;padding-bottom:48px}
+ .section-heading{align-items:flex-start;flex-direction:column}
+ .section-heading h2{font-size:25px}
+ .section-note{font-size:10px}
+ .novel-grid{gap:10px}
+ .card-body{padding:10px}
+ .card-meta{flex-wrap:wrap}
+ .card-meta span{font-size:8px}
+ .card-body h3{font-size:15px;line-height:1.25}
+ .card-author{line-height:1.4}
+ .card-bottom{flex-wrap:wrap;line-height:1.4}
+ .genre-discovery{margin-inline:14px;padding:22px;display:grid;gap:18px}
+ .genre-chips{display:flex;flex-wrap:wrap;gap:8px}
+ .feature-banner{margin:0 14px 55px;padding:20px;gap:14px}
+ .feature-banner h2{font-size:25px}
+ .feature-banner .outline-button{width:100%}
+ .page-heading{padding:48px 18px 25px}
+ .page-heading h1{font-size:clamp(36px,10vw,46px)}
+ .page-heading p{font-size:13px}
+ .catalog-tools{padding-inline:16px}
+ .catalog-tools select{min-width:0}
+ .results-line{padding-inline:16px;gap:12px;line-height:1.5}
+ .catalog-grid,#page-color>.novel-grid{padding-inline:16px}
+ .color-intro{margin-inline:16px;padding:16px;gap:12px}
+ .collection-tag{font-size:8px}
+ .detail-layout{grid-template-columns:minmax(0,1fr);padding-inline:18px;gap:24px}
+ .detail-cover{max-width:230px;margin-inline:auto}
+ .detail-copy h1{font-size:34px}
+ .detail-tags{flex-wrap:wrap}
+ .episode-row{gap:12px;padding:13px}
+ .character-grid,.upcoming-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding-inline:16px;gap:10px}
+ .character-card-copy{padding:10px}
+ .character-card-copy strong{font-size:15px}
+ .character-card-copy>span{line-height:1.4}
+ .character-profile{grid-template-columns:minmax(0,1fr);padding-inline:18px;gap:22px}
+ .character-profile-art{max-width:260px;width:100%;margin:auto}
+ .character-profile-copy h1{font-size:36px}
+ .upcoming-card-copy{padding:12px}
+ .upcoming-card-copy h2{font-size:17px}
+ .upcoming-card-copy p{font-size:10px}
+ .upcoming-teaser-grid{grid-template-columns:1fr}
+ .upcoming-teaser-grid .upcoming-card{grid-template-columns:88px minmax(0,1fr)}
+ .character-teaser-grid{grid-template-columns:1fr}
+ .reader-top{margin:20px 14px 12px}
+ .reader-label{font-size:8px;letter-spacing:1px}
+ .reader-paper{margin:12px 10px 25px;padding:28px 20px;min-height:320px}
+ .reader-paper h1{font-size:29px;line-height:1.2}
+ .reader-paper p{font-size:14px;line-height:1.85}
+ .reader-controls{margin:0 12px 55px;gap:8px}
+ .reader-controls .primary-button,.reader-controls .outline-button{padding:10px 9px;font-size:10px}
+ .reader-controls span{display:none}
+ .studio-card{margin:15px 16px 70px;padding:38px 20px}
+ .footer{padding:35px 16px}
+ .footer-links{margin:18px 0;gap:10px 16px}
+}
+@media(max-width:380px){
+ .brand-name{display:none}
+ .topbar{padding-inline:12px}
+ .theme-toggle{font-size:9px;padding:7px}
+ .login-button{font-size:9px;padding:7px}
+ .hero-cinematic h1{font-size:38px}
+ .hero-cinematic .hero-actions>*{width:100%;text-align:center}
+ .stats-strip{grid-template-columns:1fr;gap:14px}
+ .novel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .card-meta span:last-child{display:none}
+ .character-grid,.upcoming-grid{grid-template-columns:1fr}
+ .character-card-art{aspect-ratio:5/4}
+ .reader-controls{flex-wrap:wrap}
+ .reader-controls>*{flex:1}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
