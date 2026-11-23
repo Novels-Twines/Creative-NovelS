@@ -72,6 +72,11 @@ function coverMarkup(s){return s.cover?'<img class="cover-image" src="'+escapeHt
 function card(s){const index=(s.type==="ColorNovel"?colorStories:stories).indexOf(s)+1;return '<article class="novel-card" data-story="'+escapeHtml(s.id)+'" tabindex="0" role="button" aria-label="Open '+escapeHtml(s.title)+'"><div class="cover-art tone-'+s.tone+(s.cover?' has-cover':'')+'">'+coverMarkup(s)+'<span class="cover-index">NT / '+String(index).padStart(2,"0")+'</span><span class="cover-glyph">'+escapeHtml(s.glyph)+'</span><span class="cover-kind">'+escapeHtml(s.type.toUpperCase())+'</span></div><div class="card-body"><div class="card-meta"><span>'+escapeHtml(s.genres.join(", "))+'</span><span>'+(s.type==="ColorNovel"?"FULL COLOUR":"SERIAL STORY")+'</span></div><h3>'+escapeHtml(s.title)+'</h3><div class="card-author">by '+escapeHtml(s.author)+'</div><div class="card-bottom"><span>'+s.episodes+' episode'+(s.episodes===1?"":"s")+'</span><span class="status-tag">'+escapeHtml(s.updated)+'</span></div></div></article>'}
 function filtered(){const q=$("#novelSearch").value.toLowerCase(),g=$("#genreFilter").value;return stories.filter(s=>(g==="all"||s.genres.includes(g))&&[s.title,s.author,...s.genres].join(" ").toLowerCase().includes(q)).sort((a,b)=>$("#sortFilter").value==="az"?a.title.localeCompare(b.title):0)}
 function render(){
+ const genreFilter=$("#genreFilter");
+ const selectedGenre=genreFilter.value;
+ const availableGenres=[...new Set(stories.flatMap(story=>story.genres))].sort((a,b)=>a.localeCompare(b));
+ genreFilter.innerHTML='<option value="all">All genres</option>'+availableGenres.map(genre=>'<option value="'+escapeHtml(genre)+'">'+escapeHtml(genre)+'</option>').join("");
+ genreFilter.value=availableGenres.includes(selectedGenre)?selectedGenre:"all";
  const matches=filtered();
  const latest=stories.slice(0,4);
  $("#latestGrid").innerHTML=latest.map(card).join("")||'<div class="empty-state"><strong>Stories are being prepared</strong>New novels will appear here after their chapters are reviewed and approved.</div>';
