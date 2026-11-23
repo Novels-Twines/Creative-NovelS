@@ -1,4 +1,5 @@
 import { initTheme } from "./theme.js";
+import { initReaderControls, setReaderMode } from "./reader.js";
 import { loadCharacters } from "./characters.js";
 import { loadUpcoming } from "./upcoming.js";
 
@@ -71,7 +72,7 @@ async function loadLibrary(){
  }
 }
 function coverMarkup(s){return s.cover?'<img class="cover-image" src="'+escapeHtml(CONTENT_BASE+contentPath(s.cover))+'" alt="Cover of '+escapeHtml(s.title)+'" loading="lazy" onerror="this.parentElement.classList.remove(\'has-cover\');this.remove()">':""}
-function card(s){const index=(s.type==="ColorNovel"?colorStories:stories).indexOf(s)+1;return '<article class="novel-card" data-story="'+escapeHtml(s.id)+'" tabindex="0" role="button" aria-label="Open '+escapeHtml(s.title)+'"><div class="cover-art tone-'+s.tone+(s.cover?' has-cover':'')+'">'+coverMarkup(s)+'<span class="cover-index">NT / '+String(index).padStart(2,"0")+'</span><span class="cover-glyph">'+escapeHtml(s.glyph)+'</span><span class="cover-kind">'+escapeHtml(s.type.toUpperCase())+'</span></div><div class="card-body"><div class="card-meta"><span>'+escapeHtml(s.genres.join(", "))+'</span><span>'+(s.type==="ColorNovel"?"FULL COLOUR":"SERIAL STORY")+'</span></div><h3>'+escapeHtml(s.title)+'</h3><div class="card-author">by '+escapeHtml(s.author)+'</div><div class="card-bottom"><span>'+s.episodes+' episode'+(s.episodes===1?"":"s")+'</span><span class="status-tag">'+escapeHtml(s.updated)+'</span></div></div></article>'}
+function card(s){const index=(s.type==="ColorNovel"?colorStories:stories).indexOf(s)+1;const colorClass=s.type==="ColorNovel"?" color-novel-card":"";return '<article class="novel-card'+colorClass+'" data-story="'+escapeHtml(s.id)+'" tabindex="0" role="button" aria-label="Open '+escapeHtml(s.title)+'"><div class="cover-art tone-'+s.tone+(s.cover?' has-cover':'')+'">'+coverMarkup(s)+'<span class="cover-index">NT / '+String(index).padStart(2,"0")+'</span><span class="cover-glyph">'+escapeHtml(s.glyph)+'</span><span class="cover-kind">'+escapeHtml(s.type.toUpperCase())+'</span></div><div class="card-body"><div class="card-meta"><span>'+escapeHtml(s.genres.join(", "))+'</span><span>'+(s.type==="ColorNovel"?"ILLUSTRATED STORY":"SERIAL STORY")+'</span></div><h3>'+escapeHtml(s.title)+'</h3><div class="card-author">by '+escapeHtml(s.author)+'</div><div class="card-bottom"><span>'+s.episodes+' episode'+(s.episodes===1?"":"s")+'</span><span class="status-tag">'+escapeHtml(s.updated)+'</span></div></div></article>'}
 function filtered(){const q=$("#novelSearch").value.toLowerCase(),g=$("#genreFilter").value;return stories.filter(s=>(g==="all"||s.genres.includes(g))&&[s.title,s.author,...s.genres].join(" ").toLowerCase().includes(q)).sort((a,b)=>$("#sortFilter").value==="az"?a.title.localeCompare(b.title):0)}
 function render(){
  const genreFilter=$("#genreFilter");
@@ -148,10 +149,12 @@ async function getEpisode(story,index){
  if(episode.status!=="published")throw new Error("This episode is not published.");
  episodeCache.set(path,episode);return episode;
 }
-function renderMarkdown(source){
- const escaped=escapeHtml(source);
- return escaped.split(/\n{2,}/).map(block=>{
-  const lines=block.split("\n");
+function renderMarkdown(source,story){
+ const blocks=String(source||"").trim().split(/\n{2,}/);
+ return blocks.map(block=>{
+  const image=block.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+  if(image){const alt=escapeHtml(image[1]||"Story artwork"),path=image[2].trim();if(path.startsWith("/")||path.includes("..")||/^[a-z]+:/i.test(path))return "";const src=CONTENT_BASE+contentPath(path);return '<figure class="story-artwork-page"><img src="'+escapeHtml(src)+'" alt="'+alt+'" loading="lazy"><figcaption>'+alt+'</figcaption></figure>'}
+  const escaped=escapeHtml(block),lines=escaped.split("\n");
   if(lines.every(line=>/^#{1,3}\s/.test(line)))return lines.map(line=>{const n=line.match(/^(#{1,3})\s(.*)$/);return n?"<h"+n[1].length+">"+n[2]+"</h"+n[1].length+">":""}).join("");
   if(lines.every(line=>/^>\s?/.test(line)))return "<blockquote>"+lines.map(line=>line.replace(/^>\s?/,"")).join("<br>")+"</blockquote>";
   if(lines.every(line=>/^[-*]\s/.test(line)))return "<ul>"+lines.map(line=>"<li>"+line.replace(/^[-*]\s/,"")+"</li>").join("")+"</ul>";
@@ -174,7 +177,7 @@ async function openEpisode(i){
  $("#readerContent").innerHTML='<p class="reader-loading">Loading episode…</p>';$("#episodePosition").textContent="Loading…";go("reader");
  try{
   const ep=await getEpisode(currentStory,currentEpisode);
-  $("#readerContent").innerHTML='<div class="chapter-kicker">'+escapeHtml(currentStory.title.toUpperCase())+'</div><h1>'+escapeHtml(ep.title||"Episode "+(currentEpisode+1))+'</h1>'+renderMarkdown(ep.body);
+  setReaderMode(currentStory.type);$("#readerLabel").textContent=currentStory.type==="ColorNovel"?"COLORNOVELS VISUAL READER":"NOVELS-TWINES READER";$("#readerContent").classList.toggle("color-reader",currentStory.type==="ColorNovel");$("#readerContent").innerHTML='<div class="chapter-kicker">'+escapeHtml(currentStory.title.toUpperCase())+'</div><h1>'+escapeHtml(ep.title||"Episode "+(currentEpisode+1))+'</h1>'+renderMarkdown(ep.body,currentStory);
   $("#episodePosition").textContent='Episode '+(currentEpisode+1)+' of '+currentStory.episodesList.length;
  }catch(error){
   console.error(error);$("#readerContent").innerHTML='<h1>Episode unavailable</h1><p>The episode could not be loaded. Check your connection and try again.</p><button class="outline-button" type="button" data-episode="'+currentEpisode+'">Retry episode</button>';$("#episodePosition").textContent="Unavailable";
@@ -202,5 +205,6 @@ $("#prevEpisode").addEventListener("click",()=>openEpisode(currentEpisode-1));
 $("#nextEpisode").addEventListener("click",()=>currentEpisode===currentStory.episodesList.length-1?go("detail"):openEpisode(currentEpisode+1));
 $("#year").textContent=new Date().getFullYear();
 initTheme();
+initReaderControls();
 document.querySelectorAll(".page").forEach(x=>x.setAttribute("aria-hidden",String(!x.classList.contains("active"))));
 render();loadLibrary().then(loadPublicExtras);
