@@ -299,3 +299,69 @@ button,select,input{max-width:100%}
  html{scroll-behavior:auto}
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Stage 7: ColorNovels collection and reader preferences */
+.color-page-heading{padding-bottom:28px}
+.color-collection-banner{max-width:1130px;margin:0 auto 30px;padding:28px 32px;display:flex;align-items:center;gap:22px;border:1px solid rgba(215,169,121,.24);border-radius:var(--radius-lg);background:radial-gradient(ellipse at 10% 50%,rgba(168,70,91,.25),transparent 50%),linear-gradient(115deg,var(--feature-start),var(--feature-end))}
+.color-banner-mark{width:76px;height:76px;flex:0 0 76px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(215,169,121,.4);color:var(--gold);font-size:38px;background:rgba(215,169,121,.07)}
+.color-collection-banner h2{font:700 30px var(--font-display);margin:7px 0}
+.color-collection-banner p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+.color-collection-banner .collection-tag{margin-left:auto;white-space:nowrap}
+.color-novel-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.color-novel-card{border-color:rgba(215,169,121,.24);background:linear-gradient(160deg,var(--panel),var(--soft-panel))}
+.color-novel-card .cover-art{aspect-ratio:3/4;background:radial-gradient(circle at 50% 30%,#80505a,#21161c 72%)}
+.color-novel-card .card-meta span:last-child{color:var(--gold)}
+.reader-tools{max-width:800px;margin:0 auto 18px;padding:10px 14px;display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--panel)}
+.reader-tools-group{display:flex;align-items:center;gap:6px;margin-right:auto}
+.reader-tools-group>span{font-size:9px;letter-spacing:1.4px;color:var(--muted);margin-right:5px}
+.reader-tool-button{min-height:34px;padding:7px 10px;border:1px solid var(--line);border-radius:5px;background:var(--panel2);color:var(--text);font-size:10px}
+.reader-tool-button:hover{border-color:var(--gold)}
+.reader-tool-button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.reader-paper{font-size:var(--reader-font-size,18px);transition:max-width .2s,background .2s,color .2s}
+.reader-paper.reader-wide{max-width:1000px}
+.reader-paper.reader-night{background:#20191b;color:#f0e8e6;box-shadow:0 12px 35px rgba(0,0,0,.25)}
+.reader-paper.reader-night p{color:#d0c2c0}
+.reader-paper.reader-night .chapter-kicker{color:#e1a4a8}
+.reader-paper p,.reader-paper li{font-size:1em}
+.reader-paper h1{font-size:2em}
+.reader-paper h2{font-size:1.45em}
+.reader-paper blockquote{margin:22px 0;padding:10px 18px;border-left:3px solid var(--red);color:inherit;background:rgba(150,70,80,.07)}
+.story-artwork-page{margin:28px 0 34px;text-align:center}
+.story-artwork-page img{display:block;width:100%;max-height:78vh;object-fit:contain;margin:auto;border-radius:4px;box-shadow:0 16px 42px rgba(0,0,0,.2)}
+.story-artwork-page figcaption{margin-top:10px;color:var(--reader-muted);font-size:11px}
+.color-reader{max-width:1000px;padding:34px 42px;background:#171114;color:#f6eeee}
+.color-reader h1{color:#f6eeee}
+.color-reader .chapter-kicker{color:#e0b38d}
+.color-reader .story-artwork-page{margin:34px auto 42px}
+.color-reader .story-artwork-page img{max-height:82vh;box-shadow:0 22px 55px rgba(0,0,0,.38)}
+.color-reader .story-artwork-page figcaption{color:#c5b4b5}
+#page-reader[data-reader-kind="color"] .reader-tools,#page-reader[data-reader-kind="color"] .reader-controls{max-width:1000px}
+:root[data-theme="light"] .color-collection-banner{border-color:rgba(142,59,73,.22)}
+:root[data-theme="light"] .color-novel-card{background:linear-gradient(160deg,#fffaf7,#f0e5e1)}
+@media(max-width:800px){
+ .color-novel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .color-collection-banner{margin-inline:20px;padding:22px;flex-wrap:wrap}
+ .color-collection-banner .collection-tag{margin-left:0}
+ .reader-tools{margin-inline:18px;justify-content:flex-start}
+ .reader-tools-group{margin-right:0}
+ .reader-paper.reader-wide{max-width:calc(100% - 20px)}
+}
+@media(max-width:600px){
+ .color-collection-banner{margin-inline:14px;padding:18px;gap:14px}
+ .color-banner-mark{width:54px;height:54px;flex-basis:54px;font-size:28px}
+ .color-collection-banner h2{font-size:24px}
+ .color-novel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .reader-tools{margin-inline:10px;padding:9px;gap:6px}
+ .reader-tool-button{padding:7px 8px;font-size:9px}
+ .reader-tools-group{width:100%}
+ .reader-paper{font-size:var(--reader-font-size,18px);padding:26px 18px}
+ .reader-paper.reader-wide{max-width:calc(100% - 12px)}
+ .color-reader{padding:20px 12px}
+ .story-artwork-page img{max-height:70vh}
+}
+@media(max-width:380px){
+ .color-novel-grid{grid-template-columns:1fr}
+ .reader-tools{justify-content:space-between}
+ .reader-tools-group{width:auto}
+ .reader-tool-button{font-size:8px;padding:6px}
+}
